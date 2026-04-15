@@ -1,0 +1,50 @@
+body {
+  /* Step out of 'css' folder, into 'assets/img' */
+  background-image: url('../assets/img/SnobwoardStandPose.png'); 
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.readable-block {
+  background: rgba(255, 255, 255, 0.85); /* Semi-transparent white */
+  padding: 30px;
+  border-radius: 15px;
+  backdrop-filter: blur(5px); /* The 'frosted glass' effect */
+  max-width: 600px;
+  font-;
+}
+
+/* STYLE 2: Main Container (Positioning) */
+#main-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+/* STYLE 3: Content Blocks (The readable white boxes) */
+.content-block {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 30px;
+    margin: 20px;
+    border-radius: 10px;
+    max-width: 600px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    /* FONT COLOR CRITERION */
+    color: #333333; 
+}
+
+/* STYLE 4: Headings (Specific targeting) */
+h1, h2 {
+    /* FONT COLOR CRITERION */
+    color: #002e5d; /* BYU Navy Blue */
+    text-transform: uppercase;
+    border-bottom: 2px solid #002e5d;
+}

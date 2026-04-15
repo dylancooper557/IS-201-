@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Provo Peaks Snowboarding</title>
+    <style>
+        /* Criterion 1: Font Family & Global Styles */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #e0f2f1;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            /* Criterion 2: Font Color */
+            color: #002e5d; 
+        }
+
+        #game-header {
+            text-align: center;
+            padding: 20px;
+        }
+
+        /* Criterion 3: 3+ Divs for positioning (Container, Header, Stats) */
+        #game-container {
+            position: relative;
+            border: 5px solid #002e5d;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            background-color: white;
+        }
+
+        #stats-panel {
+            background: #002e5d;
+            color: white;
+            padding: 15px;
+            width: 400px;
+            text-align: center;
+            border-radius: 0 0 10px 10px;
+        }
+
+        canvas {
+            display: block;
+            background: linear-gradient(#ffffff, #e0f7fa);
+            cursor: none;
+        }
+
+        .instructions {
+            max-width: 400px;
+            font-size: 0.9em;
+            margin-top: 10px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-header">
+        <h1>Sundance Slalom</h1>
+        <p>The "R" Key is your best friend.</p>
+    </div>
+
+    <div id="game-container">
+        <canvas id="gameCanvas" width="400" height="500"></canvas>
+    </div>
+
+    <div id="stats-panel">
+        <strong>Score: <span id="scoreVal">0</span></strong>
+        <p class="instructions">Arrows/AD to Carve. <strong>Press 'R'</strong> to restart at any time.</p>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreElement = document.getElementById('scoreVal');
+
+        let score = 0;
+        let gameActive = true;
+        let gameSpeed = 3;
+        let trees = [];
+
+        const player = {
+            x: 200,
+            y: 100,
+            width: 30,
+            height: 15,
+            color: '#d32f2f',
+            speed: 5
+        };
+
+        const keys = {};
+        window.addEventListener('keydown', e => {
+            keys[e.code] = true;
+            // Listen for the 'R' key to restart
+            if (e.code === 'KeyR') {
+                resetGame();
+            }
+        });
+        window.addEventListener('keyup', e => keys[e.code] = false);
+
+        function resetGame() {
+            score = 0;
+            gameSpeed = 3;
+            trees = [];
+            player.x = 200;
+            scoreElement.innerText = score;
+            gameActive = true;
+        }
+
+        function createTree() {
+            const x = Math.random() * (canvas.width - 25);
+            trees.push({ x: x, y: canvas.height, width: 25, height: 35 });
+        }
+
+        function update() {
+            if (!gameActive) return;
+
+            if ((keys['ArrowLeft'] || keys['KeyA']) && player.x > 0) player.x -= player.speed;
+            if ((keys['ArrowRight'] || keys['KeyD']) && player.x < canvas.width - player.width) player.x += player.speed;
+
+            for (let i = trees.length - 1; i >= 0; i--) {
+                trees[i].y -= gameSpeed;
+
+                if (
+                    player.x < trees[i].x + trees[i].width &&
+                    player.x + player.width > trees[i].x &&
+                    player.y < trees[i].y + trees[i].height &&
+                    player.y + player.height > trees[i].y
+                ) {
+                    gameActive = false;
+                }
+
+                if (trees[i].y < -50) {
+                    trees.splice(i, 1);
+                    score++;
+                    scoreElement.innerText = score;
+                    if (score % 5 === 0) gameSpeed += 0.2; 
+                }
+            }
+
+            if (Math.random() < 0.04) createTree();
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw Snowboarder
+            ctx.fillStyle = player.color;
+            ctx.fillRect(player.x, player.y, player.width, player.height);
+            ctx.fillStyle = '#333';
+            ctx.fillRect(player.x - 5, player.y + 5, 5, 5);
+
+            // Draw Trees
+            trees.forEach(tree => {
+                ctx.fillStyle = '#5d4037';
+                ctx.fillRect(tree.x + 10, tree.y + 25, 5, 10);
+                ctx.fillStyle = '#2e7d32';
+                ctx.beginPath();
+                ctx.moveTo(tree.x, tree.y + 25);
+                ctx.lineTo(tree.x + 12, tree.y);
+                ctx.lineTo(tree.x + 25, tree.y + 25);
+                ctx.fill();
+            });
+
+            if (!gameActive) {
+                ctx.fillStyle = 'rgba(0,0,0,0.75)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = 'white';
+                ctx.font = 'bold 24px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('WIPE OUT!', canvas.width/2, 230);
+                ctx.font = '16px Arial';
+                ctx.fillText('Press [ R ] to Shred Again', canvas.width/2, 270);
+                ctx.textAlign = 'start';
+            }
+        }
+
+        function loop() {
+            update();
+            draw();
+            requestAnimationFrame(loop);
+        }
+
+        loop();
+    </script>
+</body>
+</html>
